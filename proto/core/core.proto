@@ -1,0 +1,270 @@
+syntax = "proto3";
+
+package core;
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/go-chat-devs/proto-core-x-gateway/gen/go/core;corev1";
+
+// UserService предоставляет методы для управления пользователями
+// UserService provides methods for managing users
+service UserService {
+	// CreateUser создает нового пользователя в системе
+	// Creates a new user in the system
+	rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+	
+	// ChangeUsername изменяет имя существующего пользователя
+	// Changes the username of an existing user
+	rpc ChangeUsername(ChangeUsernameRequest) returns (ChangeUsernameResponse);
+	
+	// ChangeUserAvatar изменяет аватар пользователя
+	// Changes the user's avatar image
+	rpc ChangeUserAvatar(ChangeUserAvatarRequest) returns (ChangeUserAvatarResponse);
+	
+	// AddFriend добавляет пользователя в список друзей
+	// Adds a user to the friend list
+	rpc AddFriend(AddFriendRequest) returns (AddFriendResponse);
+	
+	// DeleteFriend удаляет пользователя из списка друзей
+	// Removes a user from the friend list
+	rpc DeleteFriend(DeleteFriendRequest) returns (DeleteFriendResponse);
+}
+
+// ChatService предоставляет методы для управления чатами (личными и групповыми)
+// ChatService provides methods for managing private and group chats
+service ChatService {
+	// CreateChat создает личный чат между двумя пользователями
+	// Creates a private chat between two users
+	rpc CreateChat(CreateChatRequest) returns (CreateChatResponse);
+	
+	// DeleteChat удаляет личный чат и все сообщения в нем
+	// Deletes a private chat and all its messages
+	rpc DeleteChat(DeleteChatRequest) returns (DeleteChatResponse);
+	
+	// CreateGroupChat создает новую группу. Создатель становится администратором
+	// Creates a new group chat. The creator becomes an administrator
+	rpc CreateGroupChat(CreateGroupChatRequest) returns (CreateGroupChatResponse);
+	
+	// ChangeGroupChatTitle изменяет название группы (только для администраторов)
+	// Changes the group title (admins only)
+	rpc ChangeGroupChatTitle(ChangeGroupChatTitleRequest) returns (ChangeGroupChatTitleResponse);
+	
+	// ChangeGroupChatAvatar изменяет аватар группы (только для администраторов)
+	// Changes the group avatar (admins only)
+	rpc ChangeGroupChatAvatar(ChangeGroupChatAvatarRequest) returns (ChangeGroupChatAvatarResponse);
+	
+	// DeleteGroupChat удаляет группу и все связанные данные (только для администраторов)
+	// Deletes a group chat and all related data (admins only)
+	rpc DeleteGroupChat(DeleteGroupChatRequest) returns (DeleteGroupChatResponse);
+}
+
+// MessageService предоставляет методы для отправки и управления сообщениями
+// MessageService provides methods for sending and managing messages
+service MessageService {
+	// SendChatTextMessage отправляет текстовое сообщение в личный чат
+	// Sends a text message to a private chat
+	rpc SendChatTextMessage(SendChatTextMessageRequest) returns (SendChatTextMessageResponse);
+	
+	// SendGroupChatTextMessage отправляет текстовое сообщение в групповой чат
+	// Sends a text message to a group chat
+	rpc SendGroupChatTextMessage(SendGroupChatTextMessageRequest) returns (SendGroupChatTextMessageResponse);
+	
+	// SendChatImageMessage отправляет изображение в личный чат
+	// Sends an image message to a private chat
+	rpc SendChatImageMessage(SendChatImageMessageRequest) returns (SendChatImageMessageResponse);
+	
+	// SendGroupImageMessage отправляет изображение в групповой чат
+	// Sends an image message to a group chat
+	rpc SendGroupImageMessage(SendGroupImageMessageRequest) returns (SendGroupImageMessageResponse);
+	
+	// ChangeMessageText изменяет текст существующего сообщения (только для автора)
+	// Edits the text of an existing message (author only)
+	rpc ChangeMessageText(ChangeMessageTextRequest) returns (ChangeMessageTextResponse);
+	
+	// DeleteMessage удаляет сообщение (только для автора)
+	// Deletes a message (author only)
+	rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse);
+}
+
+// CreateUserRequest запрос на создание нового пользователя
+// CreateUserRequest request to create a new user
+message CreateUserRequest {
+	string user_uid = 1;                                  // Уникальный идентификатор пользователя (UUID)
+	google.protobuf.StringValue username = 2;            // Имя пользователя (опционально, может быть null)
+	google.protobuf.StringValue avatar_uid = 3;          // UUID аватара (опционально, может быть null)
+}
+
+message CreateUserResponse {}
+
+// ChangeUsernameRequest запрос на изменение имени пользователя
+// ChangeUsernameRequest request to change username
+message ChangeUsernameRequest {
+	string user_uid = 1;                                  // UUID пользователя
+	google.protobuf.StringValue new_username = 2;        // Новое имя (null = сбросить имя)
+}
+
+message ChangeUsernameResponse {}
+
+// ChangeUserAvatarRequest запрос на изменение аватара пользователя
+// ChangeUserAvatarRequest request to change user avatar
+message ChangeUserAvatarRequest {
+  string user_uid = 1;                                   // UUID пользователя
+  google.protobuf.StringValue new_avatar_uid = 2;       // UUID нового аватара (null = удалить аватар)
+}
+
+message ChangeUserAvatarResponse {}
+
+// AddFriendRequest запрос на добавление в друзья
+// AddFriendRequest request to add a friend
+message AddFriendRequest {
+  string user_uid = 1;                                   // UUID пользователя, который добавляет
+  string friend_uid = 2;                                 // UUID добавляемого друга
+}
+
+message AddFriendResponse {}
+
+// DeleteFriendRequest запрос на удаление из друзей
+// DeleteFriendRequest request to remove a friend
+message DeleteFriendRequest {
+  string user_uid = 1;                                   // UUID пользователя, который удаляет
+  string friend_uid = 2;                                 // UUID удаляемого друга
+}
+
+message DeleteFriendResponse {}
+
+// CreateChatRequest запрос на создание личного чата
+// CreateChatRequest request to create a private chat
+message CreateChatRequest {
+	string user_uid = 1;                                   // UUID первого участника
+	string friend_uid = 2;                                 // UUID второго участника
+}
+
+message CreateChatResponse {}
+
+// DeleteChatRequest запрос на удаление личного чата
+// DeleteChatRequest request to delete a private chat
+message DeleteChatRequest {
+	string user_uid = 1;                                   // UUID пользователя (для проверки доступа)
+	string friend_uid = 2;                                 // UUID второго участника чата
+}
+
+message DeleteChatResponse {}
+
+// CreateGroupChatRequest запрос на создание группового чата
+// CreateGroupChatRequest request to create a group chat
+message CreateGroupChatRequest {
+	string user_uid = 1;                                   // UUID создателя (становится администратором)
+	string title = 2;                                      // Название группы
+	google.protobuf.StringValue bio = 3;                  // Описание группы (опционально)
+	google.protobuf.StringValue avatar_uid = 4;           // UUID аватара группы (опционально)
+}
+
+message CreateGroupChatResponse {}
+
+// ChangeGroupChatTitleRequest запрос на изменение названия группы
+// ChangeGroupChatTitleRequest request to change group title
+message ChangeGroupChatTitleRequest {
+  string user_uid = 1;                                   // UUID пользователя (должен быть администратором)
+  string chat_uid = 2;                                   // UUID группы
+  string new_title = 3;                                   // Новое название
+}
+
+message ChangeGroupChatTitleResponse {}
+
+// ChangeGroupChatAvatarRequest запрос на изменение аватара группы
+// ChangeGroupChatAvatarRequest request to change group avatar
+message ChangeGroupChatAvatarRequest {
+	string user_uid = 1;                                   // UUID пользователя (должен быть администратором)
+	string chat_uid = 2;                                   // UUID группы
+	google.protobuf.StringValue avatar_uid = 3;           // UUID нового аватара (null = удалить аватар)
+}
+
+message ChangeGroupChatAvatarResponse {}
+
+// DeleteGroupChatRequest запрос на удаление группы
+// DeleteGroupChatRequest request to delete a group chat
+message DeleteGroupChatRequest {
+	string user_uid = 1;                                   // UUID пользователя (должен быть администратором)
+	string chat_uid = 2;                                   // UUID группы
+}
+
+message DeleteGroupChatResponse {}
+
+// SendChatTextMessageRequest запрос на отправку текстового сообщения в личный чат
+// SendChatTextMessageRequest request to send a text message to a private chat
+message SendChatTextMessageRequest {
+  string user_uid = 1;                                   // UUID отправителя
+  string chat_uid = 2;                                   // UUID чата
+  string text = 3;                                       // Текст сообщения
+}
+
+// SendChatTextMessageResponse ответ на отправку текстового сообщения в личный чат
+// SendChatTextMessageResponse response to sending a text message to a private chat
+message SendChatTextMessageResponse {
+  google.protobuf.Timestamp sent_at = 1;                 // Время отправки сообщения
+}
+
+// SendGroupChatTextMessageRequest запрос на отправку текстового сообщения в группу
+// SendGroupChatTextMessageRequest request to send a text message to a group chat
+message SendGroupChatTextMessageRequest {
+  string user_uid = 1;                                   // UUID отправителя (должен быть участником группы)
+  string chat_uid = 2;                                   // UUID группы
+  string text = 3;                                       // Текст сообщения
+}
+
+// SendGroupChatTextMessageResponse ответ на отправку текстового сообщения в группу
+// SendGroupChatTextMessageResponse response to sending a text message to a group chat
+message SendGroupChatTextMessageResponse {
+  google.protobuf.Timestamp sent_at = 1;                 // Время отправки сообщения
+}
+
+// SendChatImageMessageRequest запрос на отправку изображения в личный чат
+// SendChatImageMessageRequest request to send an image to a private chat
+message SendChatImageMessageRequest {
+	string user_uid = 1;                                   // UUID отправителя
+	string chat_uid = 2;                                   // UUID чата
+	string file_uid = 3;                                   // UUID файла изображения
+}
+
+// SendChatImageMessageResponse ответ на отправку изображения в личный чат
+// SendChatImageMessageResponse response to sending an image to a private chat
+message SendChatImageMessageResponse {
+  google.protobuf.Timestamp sent_at = 1;                 // Время отправки сообщения
+}
+
+// SendGroupImageMessageRequest запрос на отправку изображения в группу
+// SendGroupImageMessageRequest request to send an image to a group chat
+message SendGroupImageMessageRequest {
+	string user_uid = 1;                                   // UUID отправителя (должен быть участником группы)
+	string chat_uid = 2;                                   // UUID группы
+	string file_uid = 3;                                   // UUID файла изображения
+}
+
+// SendGroupImageMessageResponse ответ на отправку изображения в группу
+// SendGroupImageMessageResponse response to sending an image to a group chat
+message SendGroupImageMessageResponse {
+  google.protobuf.Timestamp sent_at = 1;                 // Время отправки сообщения
+}
+
+// ChangeMessageTextRequest запрос на изменение текста сообщения
+// ChangeMessageTextRequest request to edit a message text
+message ChangeMessageTextRequest {
+  string user_uid = 1;                                   // UUID пользователя (должен быть автором)
+  string message_uid = 2;                                 // UUID сообщения
+  string new_content = 3;                                 // Новый текст сообщения
+}
+
+// ChangeMessageTextResponse ответ на изменение текста сообщения
+// ChangeMessageTextResponse response to editing a message text
+message ChangeMessageTextResponse {
+  google.protobuf.Timestamp updated_at = 1;              // Время обновления сообщения
+}
+
+// DeleteMessageRequest запрос на удаление сообщения
+// DeleteMessageRequest request to delete a message
+message DeleteMessageRequest {
+  string user_uid = 1;                                   // UUID пользователя (должен быть автором)
+  string message_uid = 2;                                 // UUID сообщения
+}
+
+message DeleteMessageResponse {}
